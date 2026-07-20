@@ -36,7 +36,7 @@ def get_default_paths(cfg, data_root, data_dir, sfm_model_dir):
     if not osp.exists(color_dir):
         logger.info('color_full directory not exists! Try to parse from Frames.m4v')
         scan_video_dir = osp.join(data_dir, 'Frames.m4v')
-        assert osp.exists(scan_video_dir), 'Frames.m4v not found! Run detector fail!'
+        assert osp.exists(scan_video_dir), f'Frames.m4v not found on {scan_video_dir}! Run detector fail!'
         data_utils.video2img(scan_video_dir, color_dir)
     img_lists += glob.glob(color_dir + "/*.png", recursive=True)
     

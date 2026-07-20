@@ -1,2 +1,3 @@
-- +experiment=object_detector.yaml
-- n_ref_view=15
+- +experiment=test_GATsSPG.yaml
+- object_detect_mode=GT_box
+- save_wis3d=False

@@ -112,12 +112,13 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - +experiment=object_detector.yaml
-    - n_ref_view=15
+    - +experiment=test_GATsSPG.yaml
+    - object_detect_mode=GT_box
+    - save_wis3d=False
   job:
-    name: feature_matching_object_detector
+    name: inference
     chdir: null
-    override_dirname: +experiment=object_detector.yaml,n_ref_view=15
+    override_dirname: +experiment=test_GATsSPG.yaml,object_detect_mode=GT_box,save_wis3d=False
     id: ???
     num: ???
     config_name: config.yaml
@@ -144,7 +145,7 @@ hydra:
       provider: schema
     output_dir: /home/hiro/2d3d-efficient-pairing/OnePose
     choices:
-      experiment: object_detector.yaml
+      experiment: test_GATsSPG.yaml
       logger: null
       callbacks: null
       datamodule: null
