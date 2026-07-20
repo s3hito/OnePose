@@ -1,0 +1,2 @@
+- +experiment=object_detector.yaml
+- n_ref_view=15
