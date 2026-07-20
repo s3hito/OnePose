@@ -11,6 +11,7 @@ demo_root: ${data_dir}/runs/demo
 model:
     onepose_model_path: ${data_dir}/models/checkpoints/onepose/GATsSPG.ckpt
     extractor_model_path: ${data_dir}/models/extractors/SuperPoint/superpoint_v1.pth
+    match_model_path: ${data_dir}/models/matchers/SuperGlue/superglue_outdoor.pth
 
 network:
     detection: superpoint

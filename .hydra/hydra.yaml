@@ -112,13 +112,11 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - +experiment=test_GATsSPG.yaml
-    - object_detect_mode=GT_box
-    - save_wis3d=False
+    - +preprocess=sfm_spp_spg_sample.yaml
   job:
-    name: inference
+    name: run
     chdir: null
-    override_dirname: +experiment=test_GATsSPG.yaml,object_detect_mode=GT_box,save_wis3d=False
+    override_dirname: +preprocess=sfm_spp_spg_sample.yaml
     id: ???
     num: ???
     config_name: config.yaml
@@ -145,7 +143,7 @@ hydra:
       provider: schema
     output_dir: /home/hiro/2d3d-efficient-pairing/OnePose
     choices:
-      experiment: test_GATsSPG.yaml
+      preprocess: sfm_spp_spg_sample.yaml
       logger: null
       callbacks: null
       datamodule: null
