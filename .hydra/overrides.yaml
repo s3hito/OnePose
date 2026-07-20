@@ -1,0 +1,3 @@
+- +preprocess=sfm_spp_spg_demo
+- dataset.data_dir=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/ -annotate
+- dataset.outputs_dir=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo//sfm_model

@@ -1,0 +1,1 @@
+# px(position_x), py, pz, ex(extent_x), ey, ez, qw(quaternion_w), qx, qy, qz

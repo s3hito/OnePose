@@ -15,3 +15,4 @@ mkdir -p $REPO_ROOT/data/models/matchers/SuperGlue
 # wget https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/superglue.py
 cd $REPO_ROOT/data/models/matchers/SuperGlue
 wget https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superglue_outdoor.pth
+
