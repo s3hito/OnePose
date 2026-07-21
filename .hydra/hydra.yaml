@@ -112,11 +112,13 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - +preprocess=sfm_spp_spg_sample.yaml
+    - +experiment=test_sample.yaml
+    - object_detect_mode=feature_matching
+    - save_wis3d=True
   job:
-    name: run
+    name: inference
     chdir: null
-    override_dirname: +preprocess=sfm_spp_spg_sample.yaml
+    override_dirname: +experiment=test_sample.yaml,object_detect_mode=feature_matching,save_wis3d=True
     id: ???
     num: ???
     config_name: config.yaml
@@ -143,7 +145,7 @@ hydra:
       provider: schema
     output_dir: /home/hiro/2d3d-efficient-pairing/OnePose
     choices:
-      preprocess: sfm_spp_spg_sample.yaml
+      experiment: test_sample.yaml
       logger: null
       callbacks: null
       datamodule: null

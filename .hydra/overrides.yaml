@@ -1,1 +1,3 @@
-- +preprocess=sfm_spp_spg_sample.yaml
+- +experiment=test_sample.yaml
+- object_detect_mode=feature_matching
+- save_wis3d=True
