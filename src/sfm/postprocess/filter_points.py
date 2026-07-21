@@ -103,10 +103,7 @@ def merge(xyzs, points_idxs, dist_threshold=1e-3):
     points3D_idx_record = [] # points that have been merged
     for j in range(distance_matrix.shape[0]):
         idxs = close_than_thresh[j] 
-        print("idxs: ", idxs)
-        print("points_idxs: ", points_idxs)
-        if len(points_idxs)==0: # Added this because it was failing when points_idxs was empty
-            continue
+
         if np.isin(points_idxs[idxs], points3D_idx_record).any():
             continue
 

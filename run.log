@@ -1,0 +1,7 @@
+[2026-07-21 16:34:05,663][root][INFO] - Exporting features to /home/hiro/2d3d-efficient-pairing/OnePose/data/sfm_model/0501-matchafranzzi-box/outputs_superpoint_superglue/feats-superpoint.h5
+[2026-07-21 16:34:09,410][root][INFO] - Finishing exporting features.
+[2026-07-21 16:34:09,808][root][INFO] - Exporting matches to /home/hiro/2d3d-efficient-pairing/OnePose/data/sfm_model/0501-matchafranzzi-box/outputs_superpoint_superglue/matches-superglue.h5
+[2026-07-21 16:35:02,451][root][INFO] - Finishing exporting matches.
+[2026-07-21 16:35:02,453][root][INFO] - Generate empty model...
+[2026-07-21 16:35:03,069][root][INFO] - Writing the COLMAP model to /home/hiro/2d3d-efficient-pairing/OnePose/data/sfm_model/0501-matchafranzzi-box/outputs_superpoint_superglue/sfm_empty
+[2026-07-21 16:35:03,076][root][INFO] - Finishing writing model.
