@@ -17,8 +17,9 @@ network:
   matching: superglue
 max_num_kp3d: 2500
 input:
-  data_dirs: /home/hiro/2d3d-efficient-pairing/OnePose/data/demo/ -test
-  sfm_model_dirs: /home/hiro/2d3d-efficient-pairing/OnePose/data/demo//sfm_model
+  data_dirs: /home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee test_coffee-test
+  sfm_model_dirs: /home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee/sfm_model
 output:
   vis_dir: ${work_dir}/runs/vis/demo
   eval_dir: ${work_dir}/runs/eval/demo
+object_detect_mode: feature_matching

@@ -280,7 +280,7 @@ def read_gray_scale(img_file):
     return image
 
 def get_K(intrin_file):
-    assert Path(intrin_file).exists()
+    assert Path(intrin_file).exists(), f"File: {intrin_file} does not exist"
     with open(intrin_file, 'r') as f:
         lines = f.readlines()
     intrin_data = [line.rstrip('\n').split(':')[1] for line in lines]

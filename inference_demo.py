@@ -79,7 +79,7 @@ def load_model(cfg):
         """Load onepose model"""
         from src.models.GATsSPG_lightning_model import LitModelGATsSPG
 
-        trained_model = LitModelGATsSPG.load_from_checkpoint(checkpoint_path=model_path, map_location="cuda:0")
+        trained_model = LitModelGATsSPG.load_from_checkpoint(checkpoint_path=model_path, map_location="cuda:0", weights_only=False)
         trained_model.cuda()
         trained_model.eval()
 

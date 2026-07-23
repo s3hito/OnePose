@@ -113,14 +113,15 @@ hydra:
     - hydra.mode=RUN
     task:
     - +experiment=test_demo
-    - input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/ -test
-    - input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo//sfm_model
-    - use_tracking=False
+    - input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee
+      test_coffee-test
+    - input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee/sfm_model
+    - +object_detect_mode=feature_matching
   job:
-    name: inference_demo
+    name: inference
     chdir: null
-    override_dirname: +experiment=test_demo,input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/
-      -test,input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo//sfm_model,use_tracking=False
+    override_dirname: +experiment=test_demo,+object_detect_mode=feature_matching,input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee
+      test_coffee-test,input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee/sfm_model
     id: ???
     num: ???
     config_name: config.yaml
