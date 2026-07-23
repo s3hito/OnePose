@@ -1,6 +1,7 @@
 #!/bin/bash
 PROJECT_DIR="$(pwd)"
-OBJ_NAME=$1
+OBJ_NAME=$test_coffee
+PYTHONPATH=$PYTHONPATH:$pwd/DeepLM/build
 echo "Current work dir: $PROJECT_DIR"
 
 echo '-------------------'

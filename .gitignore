@@ -4,3 +4,9 @@ data/
 structure.txt
 error_log.txt
 runs
+tmp/
+DeepLM
+
+*.log
+.hydra/
+src/

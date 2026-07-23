@@ -1,3 +1,4 @@
-- +experiment=test_sample.yaml
-- object_detect_mode=feature_matching
-- save_wis3d=True
+- +experiment=test_demo
+- input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/ -test
+- input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo//sfm_model
+- use_tracking=False

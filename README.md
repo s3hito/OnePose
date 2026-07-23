@@ -36,7 +36,7 @@ Please refer to the official [instructions](https://colmap.github.io/install.htm
 
 ```bash
 # Working in progress, should be ready very soon, only available on test-pypi now.
-pip install -i https://test.pypi.org/simple/ wis3d
+pip install https://github.com/zju3dv/Wis3D/releases/download/2.0.3/wis3d-2.0.3-py3-none-any.whl
 ```
 
 ## Training and Evaluation on OnePose dataset
@@ -83,11 +83,13 @@ The directory should be organized in the following structure:
     ```python
     # Obtaining category-agnostic 2D object detection results first.
     # Increasing the `n_ref_view` will improve the detection robustness but with the cost of slowing down the initialization speed.
-    python feature_matching_object_detector.py +experiment=object_detector.yaml n_ref_view=15
+    python feature_matching_object_detector.py +experiment=test_sample.yaml +n_ref_view=15
 
     # Running pose estimation with `object_detect_mode` set to `feature_matching`.
+   # Compares the current camera view against several reference views from previous object detector phase
+   # and guesses the 2D position based on which reference image looks most similar. 
     # Note that enabling visualization will slow down the inference.
-    python inference.py +experiment=test_GATsSPG.yaml object_detect_mode=feature_matching save_wis3d=False
+    python inference.py +experiment=test_sample.yaml object_detect_mode=feature_matching save_wis3d=False
     ```
 
 3. Running inference with ground-truth 2D bounding boxes
@@ -96,7 +98,7 @@ The directory should be organized in the following structure:
 
     ```python
     # Note that enabling visualization will slow down the inference.
-    python inference.py +experiment=test_GATsSPG.yaml object_detect_mode=GT_box save_wis3d=False # for testing data
+    python inference.py +experiment=test_sample.yaml object_detect_mode=GT_box save_wis3d=False # for testing data
     ```
 
 
