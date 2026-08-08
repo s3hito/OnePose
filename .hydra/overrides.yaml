@@ -1,5 +1,0 @@
-- +experiment=test_demo
-- input.data_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee
-  test_coffee-test
-- input.sfm_model_dirs=/home/hiro/2d3d-efficient-pairing/OnePose/data/demo/test_coffee/sfm_model
-- +object_detect_mode=feature_matching

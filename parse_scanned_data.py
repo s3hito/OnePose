@@ -127,6 +127,7 @@ def reproj(K_homo, pose, points3d_homo):
 
 
 def parse_video(paths, downsample_rate=5, bbox_3d_homo=None, hw=512):
+    print("Parsing video file")
     orig_intrin_file = paths['final_intrin_file']
     K, K_homo = data_utils.get_K(orig_intrin_file)
 
@@ -241,11 +242,13 @@ def data_process_anno(data_dir, downsample_rate=1, hw=512):
 
     # Make fake data for demo annotate video without BA:
     if osp.exists(osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')):
-        os.system(f"rm -rf {osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')}")
+        pass
+        #os.system(f"rm -rf {osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')}")
     os.system(f"ln -s {paths['intrin_dir']} {osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')}")
 
     if osp.exists(osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')):
-        os.system(f"rm -rf {osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')}")
+        pass
+        #os.system(f"rm -rf {osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')}")
     os.system(f"ln -s {paths['out_pose_dir']} {osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')}")
 
 def data_process_test(data_dir, downsample_rate=1):
@@ -291,7 +294,8 @@ if __name__ == "__main__":
     seq_dirs = os.listdir(data_dir)
     for seq_dir in seq_dirs:
         if '-annotate' in seq_dir:
-            print('=> Processing annotate sequence: ', seq_dir)
+            print('=> Processing annotate sequence \n', seq_dir)
+            print('=> Extracting intrinsics')
             data_process_anno(osp.join(data_dir, seq_dir), downsample_rate=1, hw=512)
         elif '-test' in seq_dir:
             # Parse scanned test sequence
