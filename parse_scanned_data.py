@@ -7,6 +7,9 @@ import argparse
 from pathlib import Path
 from transforms3d import affines, quaternions
 from src.utils import data_utils
+from omegaconf import DictConfig
+import hydra
+
 
 def get_arkit_default_path(data_dir):
     video_file = osp.join(data_dir, 'Frames.m4v')
@@ -276,19 +279,13 @@ def data_process_test(data_dir, downsample_rate=1):
         index += 1
     cap.release()
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
 
-    parser.add_argument("--scanned_object_path", type=str, required=True)
 
-    args = parser.parse_args()
-    return args
+@hydra.main(version_base="1.2",config_path='configs/', config_name='config.yaml')
+def main(cfg: DictConfig):
 
-if __name__ == "__main__":
-    args = parse_args()
-    data_dir = args.scanned_object_path
+    data_dir = cfg.dataset.data_dir.split(' ')[0]
+    print("Data dir: ", data_dir)
     assert osp.exists(data_dir), f"Scanned object path:{data_dir} not exists!"
 
     seq_dirs = os.listdir(data_dir)
@@ -303,4 +300,9 @@ if __name__ == "__main__":
             data_process_test(osp.join(data_dir, seq_dir), downsample_rate=1)
         else:
             continue
+
+
+if __name__ == "__main__":
+    main()
+
 
