@@ -89,7 +89,7 @@ The directory should be organized in the following structure:
    # Compares the current camera view against several reference views from previous object detector phase
    # and guesses the 2D position based on which reference image looks most similar. 
     # Note that enabling visualization will slow down the inference.
-    python inference.py +experiment=test_sample.yaml object_detect_mode=feature_matching save_wis3d=False
+    python inference.py +experiment=test_sample.yaml
     ```
 
 3. Running inference with ground-truth 2D bounding boxes
@@ -98,7 +98,7 @@ The directory should be organized in the following structure:
 
     ```python
     # Note that enabling visualization will slow down the inference.
-    python inference.py +experiment=test_sample.yaml object_detect_mode=GT_box save_wis3d=False # for testing data
+    python inference.py +experiment=test_sample.yaml # for testing data
     ```
 
 

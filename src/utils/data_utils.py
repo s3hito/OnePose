@@ -313,4 +313,4 @@ def video2img(video_path, outdir, downsample=1):
             image_path = osp.join(outdir, '{}.png'.format(index // downsample))
             cv2.imwrite(image_path, image)
         index += 1
-    logger.info('Finish parsing video, images output to {outdir}')
+    logger.info(f'Finish parsing video, images output to {outdir}')

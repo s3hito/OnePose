@@ -1,0 +1,35 @@
+# @package _global_
+
+type: inference
+task_name: test_sample
+num_leaf: 8
+suffix: ''
+save_demo: False
+save_wis3d: True
+demo_root: ${data_dir}/runs/demo
+GT_present: False
+use_tracking: True
+model:
+    onepose_model_path: ${data_dir}/models/checkpoints/onepose/GATsSPG.ckpt
+    extractor_model_path: ${data_dir}/models/extractors/SuperPoint/superpoint_v1.pth
+    match_model_path: ${data_dir}/models/matchers/SuperGlue/superglue_outdoor.pth
+
+network:
+    detection: superpoint
+    matching: superglue
+
+object_detect_mode: 'GT_box' # ["GT_box", "feature_matching"]
+max_num_kp3d: 2500
+scan_data_dir: ${data_dir}/demo
+sfm_model_dir: ${data_dir}/demo/test_coffee/sfm_model
+
+input:
+    data_dirs:
+        - ${scan_data_dir}/test_coffee test_coffee-test
+
+    sfm_model_dirs:
+        - ${sfm_model_dir}
+
+output:
+    vis_dir: ${work_dir}/runs/vis/test_sample
+    eval_dir: ${work_dir}/runs/eval/test_sample

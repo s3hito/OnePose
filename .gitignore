@@ -10,3 +10,5 @@ DeepLM
 *.log
 .hydra/
 src/
+temp.py
+notes.txt

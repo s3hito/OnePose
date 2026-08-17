@@ -5,9 +5,9 @@ task_name: test_sample
 num_leaf: 8
 suffix: ''
 save_demo: False
-save_wis3d: False
+save_wis3d: True
 demo_root: ${data_dir}/runs/demo
-
+GT_present: True
 model:
     onepose_model_path: ${data_dir}/models/checkpoints/onepose/GATsSPG.ckpt
     extractor_model_path: ${data_dir}/models/extractors/SuperPoint/superpoint_v1.pth

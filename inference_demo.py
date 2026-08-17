@@ -248,6 +248,13 @@ def inference_core(cfg, data_root, seq_dir, sfm_model_dir):
 
             # Store previous estimated poses:
             pred_poses[id] = [pose_pred, inliers]
+            """
+            if np.array(inliers).size==0:
+                print("No object could be detected. Inliers is empty")
+                continue
+            print(pose_pred)
+            print(inliers)
+            """
             image_crop = np.asarray((inp_crop * 255).squeeze().cpu().numpy(), dtype=np.uint8)
 
         if cfg.use_tracking:

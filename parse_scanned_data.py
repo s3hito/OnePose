@@ -292,7 +292,7 @@ if __name__ == "__main__":
     assert osp.exists(data_dir), f"Scanned object path:{data_dir} not exists!"
 
     seq_dirs = os.listdir(data_dir)
-    for seq_dir in seq_dirs:
+    for seq_dir in seq_dirs[::-1]:
         if '-annotate' in seq_dir:
             print('=> Processing annotate sequence \n', seq_dir)
             print('=> Extracting intrinsics')
