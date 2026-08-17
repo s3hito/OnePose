@@ -2,6 +2,7 @@
 
 # specify here default training configuration
 defaults:
+    - _self_
     - trainer: null
     - model: null 
     - datamodule: null
@@ -39,3 +40,5 @@ print_config: True
 hydra:
     run:
         dir: ${work_dir}
+    job:
+        chdir: true

@@ -1,1 +1,17 @@
 .idea
+.env
+data/
+structure.txt
+error_log.txt
+runs
+tmp/
+DeepLM
+
+*.log
+.hydra/
+src/
+temp.py
+notes.txt
+*Zone.Identifier
+*/__pychache__/*
+track_kpt.mp4

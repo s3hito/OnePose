@@ -280,7 +280,7 @@ def read_gray_scale(img_file):
     return image
 
 def get_K(intrin_file):
-    assert Path(intrin_file).exists()
+    assert Path(intrin_file).exists(), f"File: {intrin_file} does not exist"
     with open(intrin_file, 'r') as f:
         lines = f.readlines()
     intrin_data = [line.rstrip('\n').split(':')[1] for line in lines]
@@ -313,4 +313,4 @@ def video2img(video_path, outdir, downsample=1):
             image_path = osp.join(outdir, '{}.png'.format(index // downsample))
             cv2.imwrite(image_path, image)
         index += 1
-    logger.info('Finish parsing video, images output to {outdir}')
+    logger.info(f'Finish parsing video, images output to {outdir}')

@@ -7,6 +7,9 @@ import argparse
 from pathlib import Path
 from transforms3d import affines, quaternions
 from src.utils import data_utils
+from omegaconf import DictConfig
+import hydra
+
 
 def get_arkit_default_path(data_dir):
     video_file = osp.join(data_dir, 'Frames.m4v')
@@ -127,6 +130,7 @@ def reproj(K_homo, pose, points3d_homo):
 
 
 def parse_video(paths, downsample_rate=5, bbox_3d_homo=None, hw=512):
+    print("Parsing video file")
     orig_intrin_file = paths['final_intrin_file']
     K, K_homo = data_utils.get_K(orig_intrin_file)
 
@@ -239,14 +243,7 @@ def data_process_anno(data_dir, downsample_rate=1, hw=512):
 
     parse_video(paths, downsample_rate, bbox_3d_homo, hw=hw)
 
-    # Make fake data for demo annotate video without BA:
-    if osp.exists(osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')):
-        os.system(f"rm -rf {osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')}")
-    os.system(f"ln -s {paths['intrin_dir']} {osp.join(osp.dirname(paths['intrin_dir']), 'intrin_ba')}")
-
-    if osp.exists(osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')):
-        os.system(f"rm -rf {osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')}")
-    os.system(f"ln -s {paths['out_pose_dir']} {osp.join(osp.dirname(paths['out_pose_dir']), 'poses_ba')}")
+    
 
 def data_process_test(data_dir, downsample_rate=1):
     paths = get_test_default_path(data_dir)
@@ -273,25 +270,20 @@ def data_process_test(data_dir, downsample_rate=1):
         index += 1
     cap.release()
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
 
-    parser.add_argument("--scanned_object_path", type=str, required=True)
 
-    args = parser.parse_args()
-    return args
+@hydra.main(version_base="1.1",config_path='configs/', config_name='config.yaml')
+def main(cfg: DictConfig):
 
-if __name__ == "__main__":
-    args = parse_args()
-    data_dir = args.scanned_object_path
+    data_dir = cfg.dataset.data_dir.split(' ')[0]
+    print("Data dir: ", data_dir)
     assert osp.exists(data_dir), f"Scanned object path:{data_dir} not exists!"
 
     seq_dirs = os.listdir(data_dir)
-    for seq_dir in seq_dirs:
+    for seq_dir in seq_dirs[::-1]:
         if '-annotate' in seq_dir:
-            print('=> Processing annotate sequence: ', seq_dir)
+            print('=> Processing annotate sequence \n', seq_dir)
+            print('=> Extracting intrinsics')
             data_process_anno(osp.join(data_dir, seq_dir), downsample_rate=1, hw=512)
         elif '-test' in seq_dir:
             # Parse scanned test sequence
@@ -299,4 +291,9 @@ if __name__ == "__main__":
             data_process_test(osp.join(data_dir, seq_dir), downsample_rate=1)
         else:
             continue
+
+
+if __name__ == "__main__":
+    main()
+
 

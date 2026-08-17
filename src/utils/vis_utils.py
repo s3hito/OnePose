@@ -11,7 +11,7 @@ import natsort
 from loguru import logger
 
 matplotlib.use("Agg")
-jet = cm.get_cmap("jet")
+jet = matplotlib.colormaps["jet"]
 jet_colors = jet(np.arange(256))[:, :3]
 
 

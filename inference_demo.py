@@ -79,7 +79,7 @@ def load_model(cfg):
         """Load onepose model"""
         from src.models.GATsSPG_lightning_model import LitModelGATsSPG
 
-        trained_model = LitModelGATsSPG.load_from_checkpoint(checkpoint_path=model_path)
+        trained_model = LitModelGATsSPG.load_from_checkpoint(checkpoint_path=model_path, map_location="cuda:0", weights_only=False)
         trained_model.cuda()
         trained_model.eval()
 
@@ -248,6 +248,13 @@ def inference_core(cfg, data_root, seq_dir, sfm_model_dir):
 
             # Store previous estimated poses:
             pred_poses[id] = [pose_pred, inliers]
+            """
+            if np.array(inliers).size==0:
+                print("No object could be detected. Inliers is empty")
+                continue
+            print(pose_pred)
+            print(inliers)
+            """
             image_crop = np.asarray((inp_crop * 255).squeeze().cpu().numpy(), dtype=np.uint8)
 
         if cfg.use_tracking:
@@ -332,7 +339,7 @@ def inference(cfg):
             inference_core(cfg, data_root, seq_dir, sfm_model_dir)
 
 
-@hydra.main(config_path="configs/", config_name="config.yaml")
+@hydra.main(version_base='1.1', config_path="configs/", config_name="config.yaml")
 def main(cfg):
     globals()[cfg.type](cfg)
 

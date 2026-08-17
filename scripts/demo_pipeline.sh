@@ -1,6 +1,8 @@
 #!/bin/bash
 PROJECT_DIR="$(pwd)"
-OBJ_NAME=$1
+OBJ_NAME="test_coffee"
+echo $OBJ_NAME
+PYTHONPATH=$PYTHONPATH:$pwd/DeepLM/build
 echo "Current work dir: $PROJECT_DIR"
 
 echo '-------------------'
@@ -37,4 +39,5 @@ python $PROJECT_DIR/inference_demo.py \
     +experiment="test_demo" \
     input.data_dirs="$PROJECT_DIR/data/demo/$OBJ_NAME $OBJ_NAME-test" \
     input.sfm_model_dirs="$PROJECT_DIR/data/demo/$OBJ_NAME/sfm_model" \
-    use_tracking=${WITH_TRACKING}
+    use_tracking=True \
+    save_wis3d=True
