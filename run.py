@@ -79,6 +79,7 @@ def merge_anno(cfg):
 
 def sfm(cfg):
     """ Reconstruct and postprocess sparse object point cloud, and store point cloud features"""
+
     data_dirs = cfg.dataset.data_dir
     down_ratio = cfg.sfm.down_ratio
     data_dirs = [data_dirs] if isinstance(data_dirs, str) else data_dirs
@@ -105,7 +106,7 @@ def sfm(cfg):
             continue
         
         obj_name = root_dir.split('/')[-1]
-        outputs_dir_root = cfg.dataset.outputs_dir.format(obj_name)
+        outputs_dir_root = cfg.dataset.outputs_dir
 
         # Begin SfM and postprocess:
         sfm_core(cfg, img_lists, outputs_dir_root)
