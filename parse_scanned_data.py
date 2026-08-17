@@ -281,7 +281,7 @@ def data_process_test(data_dir, downsample_rate=1):
 
 
 
-@hydra.main(version_base="1.2",config_path='configs/', config_name='config.yaml')
+@hydra.main(version_base="1.1",config_path='configs/', config_name='config.yaml')
 def main(cfg: DictConfig):
 
     data_dir = cfg.dataset.data_dir.split(' ')[0]
