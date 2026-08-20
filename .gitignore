@@ -11,6 +11,8 @@ DeepLM
 .hydra/
 src/
 temp.py
+temp.ipynb
+dinov2/
 notes.txt
 *Zone.Identifier
 */__pychache__/*

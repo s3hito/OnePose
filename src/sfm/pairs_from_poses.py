@@ -37,34 +37,60 @@ def get_pairswise_distances(pose_files):
     return dist, dR, seqs_ids
 
 
-def covis_from_pose(img_lists, covis_pairs_out, num_matched, max_rotation, do_ba=False):
-    pose_lists = [path_utils.get_gt_pose_path_by_color(color_path) for color_path in img_lists]
-    dist, dR, seqs_ids = get_pairswise_distances(pose_lists)
 
-    min_rotation = 10
-    valid = dR > min_rotation
-    np.fill_diagonal(valid, False)
-    dist = np.where(valid, dist, np.inf)
+def pairs_from_retrieval(img_lists, k):
+    import torch.nn.functional as F, torch
+    import numpy as np
+    from src.sfm.dino_extractor import extract_embeddings
 
+    embeddings = extract_embeddings(img_lists, batch_size=16)
+
+    global_feats = F.normalize(embeddings, dim=-1)
+    sim_matrix = torch.mm(global_feats, global_feats.T).cpu().numpy()
+    np.fill_diagonal(sim_matrix, 0)
     pairs = []
-    num_matched_per_seq = num_matched // len(seqs_ids.keys())
-    for i in range(len(img_lists)):
-        dist_i = dist[i]
-        for seq_id in seqs_ids:
-            ids = np.array(seqs_ids[seq_id])
-            try:
-                idx = np.argpartition(dist_i[ids], num_matched_per_seq * 2)[: num_matched_per_seq:2] 
-            except:
-                idx = np.argpartition(dist_i[ids], dist_i.shape[0]-1)
-            idx = ids[idx]
-            idx = idx[np.argsort(dist_i[idx])]
-            idx = idx[valid[i][idx]]
 
-            for j in idx:
-                name0 = img_lists[i]
-                name1 = img_lists[j]
+    for i in range(len(sim_matrix)):
+        top_k_matches = np.argsort(sim_matrix[i])[::-1][:k]
+        for j in top_k_matches:
+            if i < j:
+                pairs.append((img_lists[i].split('/')[-1], img_lists[int(j)].split('/')[-1]))
+    return pairs
 
-                pairs.append((name0, name1))
+
+def covis_from_pose(img_lists, covis_pairs_out, cfg, max_rotation, do_ba=False):
+    pose_lists = [path_utils.get_gt_pose_path_by_color(color_path) for color_path in img_lists]
+    if not cfg.sfm.use_sam3_masks:
+        print("Computing co-visibility on spacial distance ")
+        dist, dR, seqs_ids = get_pairswise_distances(pose_lists)
+
+        min_rotation = 10
+        valid = dR > min_rotation
+        np.fill_diagonal(valid, False)
+        dist = np.where(valid, dist, np.inf)
+
+        pairs = []
+        num_matched_per_seq = cfg.sfm.covis_num // len(seqs_ids.keys())
+        for i in range(len(img_lists)):
+            dist_i = dist[i]
+            for seq_id in seqs_ids:
+                ids = np.array(seqs_ids[seq_id])
+                try:
+                    idx = np.argpartition(dist_i[ids], num_matched_per_seq * 2)[: num_matched_per_seq:2]
+                except:
+                    idx = np.argpartition(dist_i[ids], dist_i.shape[0] - 1)
+                idx = ids[idx]
+                idx = idx[np.argsort(dist_i[idx])]
+                idx = idx[valid[i][idx]]
+
+                for j in idx:
+                    name0 = img_lists[i]
+                    name1 = img_lists[j]
+
+                    pairs.append((name0, name1))
+    else:
+        print("Computing co-visibility on embeddings ")
+        pairs = pairs_from_retrieval(img_lists, cfg.sfm.covis_num)
 
     with open(covis_pairs_out, 'w') as f:
         f.write('\n'.join(' '.join([i, j]) for i, j in pairs))

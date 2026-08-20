@@ -4,6 +4,8 @@ import glob
 import hydra
 
 import os.path as osp
+
+import pycolmap
 from loguru import logger
 from pathlib import Path
 from omegaconf import DictConfig
@@ -110,59 +112,115 @@ def sfm(cfg):
 
         # Begin SfM and postprocess:
         sfm_core(cfg, img_lists, outputs_dir_root)
-        postprocess(cfg, img_lists, root_dir, outputs_dir_root) 
+        postprocess(cfg, img_lists, root_dir, outputs_dir_root)
+
 
 
 def sfm_core(cfg, img_lists, outputs_dir_root):
     """ Sparse reconstruction: extract features, match features, triangulation"""
     from src.sfm import extract_features, match_features, \
                          generate_empty, triangulation, pairs_from_poses
-
+    from src.sfm import colmap_reconstruction
     # Construct output directory structure:
-    outputs_dir = osp.join(outputs_dir_root, 'outputs' + '_' + cfg.network.detection + '_' + cfg.network.matching)
-    feature_out = osp.join(outputs_dir, f'feats-{cfg.network.detection}.h5')
-    covis_pairs_out = osp.join(outputs_dir, f'pairs-covis{cfg.sfm.covis_num}.txt')
-    matches_out = osp.join(outputs_dir, f'matches-{cfg.network.matching}.h5')
-    empty_dir = osp.join(outputs_dir, 'sfm_empty')
-    deep_sfm_dir = osp.join(outputs_dir, 'sfm_ws')
+    if not cfg.sfm.use_sam3_masks:
+        outputs_dir = osp.join(outputs_dir_root, 'outputs' + '_' + cfg.network.detection + '_' + cfg.network.matching)
+        feature_out = osp.join(outputs_dir, f'feats-{cfg.network.detection}.h5')
+        covis_pairs_out = osp.join(outputs_dir, f'pairs-covis{cfg.sfm.covis_num}.txt')
+        matches_out = osp.join(outputs_dir, f'matches-{cfg.network.matching}.h5')
+        empty_dir = osp.join(outputs_dir, 'sfm_empty')
+        deep_sfm_dir = osp.join(outputs_dir, 'sfm_ws')
+    else:
+        covis_pairs_out = osp.join(outputs_dir_root, 'pairs.txt')
     
     if cfg.redo:
-        os.system(f'rm -rf {outputs_dir}') 
-        Path(outputs_dir).mkdir(exist_ok=True, parents=True)
+        if not cfg.sfm.use_sam3_masks:
+            os.system(f'rm -rf {outputs_dir}')
+            Path(outputs_dir).mkdir(exist_ok=True, parents=True)
 
-        # Extract image features, construct image pairs and then match:
-        extract_features.main(img_lists, feature_out, cfg)
-        pairs_from_poses.covis_from_pose(img_lists, covis_pairs_out, cfg.sfm.covis_num, max_rotation=cfg.sfm.rotation_thresh)
-        match_features.main(cfg, feature_out, covis_pairs_out, matches_out, vis_match=False)
+
 
         # Reconstruct 3D point cloud with known image poses:
-        generate_empty.generate_model(img_lists, empty_dir)
-        triangulation.main(deep_sfm_dir, empty_dir, outputs_dir, covis_pairs_out, feature_out, matches_out, image_dir=None)
-    
-    
+        if not cfg.sfm.use_sam3_masks:
+            # Extract image features, construct image pairs and then match:
+
+            extract_features.main(img_lists, feature_out, cfg)
+            pairs_from_poses.covis_from_pose(img_lists, covis_pairs_out, cfg, max_rotation=cfg.sfm.rotation_thresh)
+            match_features.main(cfg, feature_out, covis_pairs_out, matches_out, vis_match=False)
+            generate_empty.generate_model(img_lists, empty_dir)
+            triangulation.main(deep_sfm_dir, empty_dir, outputs_dir, covis_pairs_out, feature_out, matches_out, image_dir=None)
+        else:
+            pairs_from_poses.covis_from_pose(img_lists, covis_pairs_out, cfg, max_rotation=cfg.sfm.rotation_thresh)
+            colmap_reconstruction.reconstruct(cfg)
+
+def get_ponits_ids_outside_mask(cfg, reconstruction):
+    import cv2, numpy as np
+    object_dir = Path(cfg.dataset.data_dir.split()[0])
+    images_dir = object_dir / (cfg.obj_name+'-annotate')
+    color_dir = images_dir / 'color'
+    masks_dir = images_dir / 'masks'
+    sparse_path = Path(cfg.dataset.outputs_dir) / '0'
+
+
+    reconstruction.read(sparse_path)
+    images = reconstruction.images
+
+    point_scores = {}
+    for image_id in images:
+        for point in images[image_id].points2D:
+            point_scores[point.point3D_id] = 0
+
+
+
+
+    for image_id in images:
+        image_mask_name = images[image_id].name.lower() + ".png"
+        mask_path = masks_dir / image_mask_name
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+
+        for point in images[image_id].points2D:
+            point_2d = np.array(point.xy, dtype=int)
+
+            inside_mask = mask[point_2d[1],point_2d[0]] == 1
+            if inside_mask:
+                point_scores[point.point3D_id] +=1
+    for key in list(point_scores.keys()):
+        if point_scores[key] != 0:
+            del point_scores[key]
+    return point_scores
+
 def postprocess(cfg, img_lists, root_dir, outputs_dir_root):
     """ Filter points and average feature"""
-    from src.sfm.postprocess import filter_points, feature_process, filter_tkl
+    if not cfg.sfm.use_sam3_masks:
 
-    bbox_path = osp.join(root_dir, "box3d_corners.txt")
-    # Construct output directory structure:
-    outputs_dir = osp.join(outputs_dir_root, 'outputs' + '_' + cfg.network.detection + '_' + cfg.network.matching)
-    feature_out = osp.join(outputs_dir, f'feats-{cfg.network.detection}.h5')
-    deep_sfm_dir = osp.join(outputs_dir, 'sfm_ws')
-    model_path = osp.join(deep_sfm_dir, 'model')
+        from src.sfm.postprocess import filter_points, feature_process, filter_tkl
 
-    # Select feature track length to limit the number of 3D points below the 'max_num_kp3d' threshold:
-    track_length, points_count_list = filter_tkl.get_tkl(model_path, thres=cfg.dataset.max_num_kp3d, show=False) 
-    filter_tkl.vis_tkl_filtered_pcds(model_path, points_count_list, track_length, outputs_dir) # For visualization only
+        bbox_path = osp.join(root_dir, "box3d_corners.txt")
+        # Construct output directory structure:
+        outputs_dir = osp.join(outputs_dir_root, 'outputs' + '_' + cfg.network.detection + '_' + cfg.network.matching)
+        feature_out = osp.join(outputs_dir, f'feats-{cfg.network.detection}.h5')
+        deep_sfm_dir = osp.join(outputs_dir, 'sfm_ws')
+        model_path = osp.join(deep_sfm_dir, 'model')
 
-    # Leverage the selected feature track length threshold and 3D BBox to filter 3D points:
-    xyzs, points_idxs = filter_points.filter_3d(model_path, track_length, bbox_path)
-    # Merge 3d points by distance between points
-    merge_xyzs, merge_idxs = filter_points.merge(xyzs, points_idxs, dist_threshold=1e-3) 
+        # Select feature track length to limit the number of 3D points below the 'max_num_kp3d' threshold:
+        track_length, points_count_list = filter_tkl.get_tkl(model_path, thres=cfg.dataset.max_num_kp3d, show=False)
+        filter_tkl.vis_tkl_filtered_pcds(model_path, points_count_list, track_length, outputs_dir) # For visualization only
 
-    # Save features of the filtered point cloud:
-    feature_process.get_kpt_ann(cfg, img_lists, feature_out, outputs_dir, merge_idxs, merge_xyzs)
-    
+        # Leverage the selected feature track length threshold and 3D BBox to filter 3D points:
+        xyzs, points_idxs = filter_points.filter_3d(model_path, track_length, bbox_path)
+        # Merge 3d points by distance between points
+        merge_xyzs, merge_idxs = filter_points.merge(xyzs, points_idxs, dist_threshold=1e-3)
+
+        # Save features of the filtered point cloud:
+        feature_process.get_kpt_ann(cfg, img_lists, feature_out, outputs_dir, merge_idxs, merge_xyzs)
+    else:
+        logger.info("Filtering reconstruction")
+        reconstruction = pycolmap.Reconstruction()
+        point_to_delete = get_ponits_ids_outside_mask(cfg, reconstruction)
+        for point_id in point_to_delete.keys():
+            reconstruction.delete_point3D(point_id)
+
+        reconstruction.write(cfg.dataset.outputs_dir+'/0')
+        logger.info("Reconstruction written")
 
 @hydra.main(version_base='1.1',config_path='configs/', config_name='config.yaml')
 def main(cfg: DictConfig):
